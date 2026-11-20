@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "BLESSED BARBER - Agenda",
+  "short_name": "BLESSED",
+  "description": "Agenda personal de turnos de BLESSED BARBER",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101010",
+  "theme_color": "#101010",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
