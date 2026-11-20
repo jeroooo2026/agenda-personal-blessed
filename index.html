@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101010">
+<title>BLESSED BARBER | Agenda</title>
+<style>
+:root{--bg:#101010;--panel:#1b1b1b;--panel2:#242424;--gold:#c8a65a;--gold2:#e2c77f;--txt:#f4f1e9;--muted:#aaa49a;--line:#34312b;--green:#83c69a;--red:#e58d83}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom));max-width:720px;margin:auto}
+header{padding:24px 2px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.brand{font-size:19px;font-weight:900;letter-spacing:2px}.brand span{color:var(--gold)}.sub{font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:5px}
+.datebar{display:flex;gap:10px;align-items:center;margin:20px 0}.datebar input{flex:1}
+input,select,textarea{width:100%;background:#111;border:1px solid #454035;border-radius:10px;padding:12px;color:var(--txt);font:inherit;min-width:0}
+button{border:0;border-radius:10px;padding:12px 15px;font:inherit;font-weight:700;cursor:pointer}
+.gold{background:var(--gold);color:#17130a}.ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}.danger{background:#472522;color:#ffd8d2}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:14px 0 22px}.stat{background:var(--panel);border:1px solid var(--line);padding:14px 12px;border-radius:13px}.num{font-size:23px;font-weight:800;color:var(--gold2)}.small{font-size:11px;color:var(--muted);margin-top:4px}
+h2{font-size:15px;letter-spacing:1px;margin:22px 0 12px}.toolbar{display:flex;gap:8px}.toolbar button{flex:1}
+.appointment{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0;display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center}
+.time{font-weight:800;color:var(--gold2);font-size:16px}.client{font-weight:750}.detail{font-size:12px;color:var(--muted);margin-top:4px}.price{font-weight:800;text-align:right}.status{font-size:10px;margin-top:5px;color:var(--green);text-align:right}.status.pending{color:var(--gold2)}.status.cancelled{color:var(--red)}
+.actions{display:flex;gap:6px;margin-top:9px}.actions button{font-size:11px;padding:7px 9px}
+.empty{text-align:center;padding:28px 12px;color:var(--muted);background:var(--panel);border-radius:13px}
+nav{position:sticky;bottom:0;background:#101010;padding:12px 0 max(12px,env(safe-area-inset-bottom));display:flex;gap:8px;border-top:1px solid var(--line);margin-top:20px}
+nav button{flex:1;background:var(--panel);color:var(--muted);font-size:12px}nav button.active{color:var(--gold2);border:1px solid var(--gold)}
+section[hidden]{display:none}
+form{display:grid;gap:10px;background:var(--panel);padding:15px;border:1px solid var(--line);border-radius:14px}
+label{font-size:12px;color:var(--muted);display:grid;gap:6px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:18px}
+@media(max-width:390px){.stats{gap:6px}.stat{padding:11px 8px}.num{font-size:20px}.appointment{grid-template-columns:50px 1fr auto;padding:11px 9px}}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Blessed Barber">
+<meta name="theme-color" content="#101010">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+\n</head>
+<body>
+<header><div><div class="brand">BLESSED <span>BARBER</span></div><div class="sub">AGENDA PERSONAL</div></div><div style="color:var(--gold);font-size:24px">✦</div></header>
+
+<section id="agenda">
+ <div class="datebar"><label style="flex:1">Fecha de agenda<input id="day" type="date"></label><button class="gold" onclick="newTurn()">＋ Turno</button></div>
+ <div class="stats">
+  <div class="stat"><div class="num" id="count">0</div><div class="small">TURNOS</div></div>
+  <div class="stat"><div class="num" id="done">0</div><div class="small">REALIZADOS</div></div>
+  <div class="stat"><div class="num" id="income">$0</div><div class="small">INGRESOS</div></div>
+ </div>
+ <h2>TURNOS DEL DÍA</h2><div id="turns"></div>
+</section>
+
+<section id="formView" hidden>
+ <h2 id="formTitle">NUEVO TURNO</h2>
+ <form id="turnForm">
+  <label>Nombre del cliente<input id="name" required placeholder="Ej. Juan"></label>
+  <div class="two"><label>Fecha<input id="fdate" type="date" required></label><label>Hora del turno<input id="time" type="time" required></label></div>
+  <div class="two"><label>Duración<select id="duration"><option value="30">30 minutos</option><option value="45">45 minutos</option></select></label><label>Precio del corte ($)<input id="price" type="number" min="0" step="100" placeholder="Ej. 8000"></label></div>
+  <div class="two"><button class="gold" type="submit">Guardar turno</button><button class="ghost" type="button" onclick="show('agenda')">Volver</button></div>
+ </form>
+</section>
+
+<section id="history" hidden><h2>HISTORIAL Y GANANCIAS</h2><div class="datebar"><label style="flex:1">Ver mes<input type="month" id="month"></label></div><div class="stats"><div class="stat"><div class="num" id="mcount">0</div><div class="small">TURNOS</div></div><div class="stat"><div class="num" id="mDone">0</div><div class="small">REALIZADOS</div></div><div class="stat"><div class="num" id="mIncome">$0</div><div class="small">FACTURADO</div></div></div><div id="historyList"></div></section>
+
+<nav><button class="active" id="navAgenda" onclick="show('agenda')">▦ Agenda</button><button id="navHistory" onclick="show('history')">◷ Historial</button></nav>
+<p class="note">Atención: martes a viernes de 17:00 a 20:30 y sábados de 15:00 a 18:00. Podés elegir turnos de 30 o 45 minutos.<br>Tus datos se guardan en el almacenamiento de este navegador en este dispositivo. Si borrás los datos del navegador o cambiás de celular, no se podrán recuperar porque esta versión no tiene copia de seguridad.</p>
+
+<script>
+const $=id=>document.getElementById(id);
+const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(n)||0);
+let data=[];try{data=JSON.parse(localStorage.getItem('blessed_barber_turns')||'[]')}catch(e){data=[]}
+let editing=null;
+function persist(){localStorage.setItem('blessed_barber_turns',JSON.stringify(data))}
+function show(which){['agenda','formView','history'].forEach(x=>$(x).hidden=x!==which);$('navAgenda').classList.toggle('active',which==='agenda');$('navHistory').classList.toggle('active',which==='history');if(which==='agenda')render();if(which==='history')renderHistory()}
+function newTurn(){editing=null;$('turnForm').reset();$('fdate').value=$('day').value;$('duration').value='30';$('formTitle').textContent='NUEVO TURNO';show('formView')}
+function editTurn(id){let t=data.find(x=>x.id===id);if(!t)return;editing=id;['name','fdate','time','duration','price'].forEach(k=>$(k).value=t[k]??(k==='duration'?'30':''));$('formTitle').textContent='EDITAR TURNO';show('formView')}
+$('turnForm').addEventListener('submit',e=>{e.preventDefault();let date=$('fdate').value, time=$('time').value, duration=Number($('duration').value)||30;
+if(!date||!time){alert('Completá la fecha y la hora.');return;}
+let weekday=new Date(date+'T12:00:00').getDay();
+let start=(weekday===6?'15:00':(weekday>=2&&weekday<=5?'17:00':null));
+let end=(weekday===6?'18:00':(weekday>=2&&weekday<=5?'20:30':null));
+if(!start){alert('La barbería atiende de martes a viernes y los sábados.');return;}
+let mins=s=>Number(s.slice(0,2))*60+Number(s.slice(3,5)), begin=mins(time), finish=begin+duration;
+if(begin<mins(start)||finish>mins(end)){alert('Ese turno queda fuera del horario de atención. Revisá el día y la duración.');return;}
+let conflict=data.find(x=>x.id!==editing&&x.fdate===date&&x.status!=='Cancelado'&&begin<mins(x.time)+(Number(x.duration)||30)&&finish>mins(x.time));
+if(conflict){alert('Ese horario se superpone con el turno de '+conflict.name+'. Elegí otro horario.');return;}
+let previous=editing?data.find(x=>x.id===editing):null;let t={id:editing||String(Date.now()),name:$('name').value.trim(),fdate:date,time,duration,price:Number($('price').value)||0,status:previous?.status||'Pendiente'};if(editing)data=data.map(x=>x.id===editing?t:x);else data.push(t);persist();$('day').value=t.fdate;show('agenda')});
+function removeTurn(id){if(confirm('¿Eliminar este turno?')){data=data.filter(x=>x.id!==id);persist();render();renderHistory()}}
+function setStatus(id,s){data=data.map(x=>x.id===id?{...x,status:s}:x);persist();render();renderHistory()}
+function render(){let d=$('day').value;let list=data.filter(x=>x.fdate===d).sort((a,b)=>a.time.localeCompare(b.time));$('count').textContent=list.length;$('done').textContent=list.filter(x=>x.status==='Realizado').length;$('income').textContent=money(list.filter(x=>x.status==='Realizado').reduce((a,x)=>a+x.price,0));$('turns').innerHTML=list.length?list.map(t=>`<article class="appointment"><div class="time">${esc(t.time)}</div><div><div class="client">${esc(t.name)}</div><div class="detail">Duración: ${Number(t.duration)||30} min</div><div class="actions"><button class="ghost" onclick="editTurn('${t.id}')">Editar</button><button class="ghost" onclick="setStatus('${t.id}','Realizado')">Realizado</button><button class="danger" onclick="removeTurn('${t.id}')">Borrar</button></div></div><div><div class="price">${money(t.price)}</div><div class="status ${t.status==='Pendiente'?'pending':t.status==='Cancelado'?'cancelled':''}">${esc(t.status)}</div></div></article>`).join(''):'<div class="empty">No hay turnos para este día.<br>Usá “＋ Turno” para agregar el primero.</div>'}
+function renderHistory(){let m=$('month').value;let list=data.filter(x=>x.fdate.startsWith(m)).sort((a,b)=>(b.fdate+b.time).localeCompare(a.fdate+a.time));$('mcount').textContent=list.length;$('mDone').textContent=list.filter(x=>x.status==='Realizado').length;$('mIncome').textContent=money(list.filter(x=>x.status==='Realizado').reduce((a,x)=>a+x.price,0));$('historyList').innerHTML=list.length?list.map(t=>`<article class="appointment"><div class="time">${esc(t.fdate.slice(8,10)+'/'+t.fdate.slice(5,7))}</div><div><div class="client">${esc(t.name)}</div><div class="detail">${esc(t.time)} · ${Number(t.duration)||30} min</div></div><div><div class="price">${money(t.price)}</div><div class="status">${esc(t.status)}</div></div></article>`).join(''):'<div class="empty">Todavía no hay turnos en este mes.</div>'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('day').value=today();$('month').value=today().slice(0,7);$('day').addEventListener('change',render);$('month').addEventListener('change',renderHistory);render();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+\n</body></html>
